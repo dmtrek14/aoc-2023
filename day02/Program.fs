@@ -58,5 +58,48 @@ let checkPossibleGamesPartOne (filepath: string) =
         printfn $"{gameIdsAdded}"
     )
 
-checkPossibleGamesPartOne "./data/input.txt"
+//checkPossibleGamesPartOne "./data/input.txt"
 
+
+let checkPossibleGamesPartTwo (filepath: string) =
+    let mutable gamePowersAdded = 0
+    let gameNumRegex = new Regex("\d+(?=:)")
+    let gamesRegex = new Regex("(?<=\: ).*")
+    let blueRegex = new Regex("\d+ blue")
+    let redRegex = new Regex("\d+ red")
+    let greenRegex = new Regex("\d+ green")
+    let digitRegex = new Regex("\d+")
+
+    let getDigit digitString : int =
+        let digit = digitRegex.Match(digitString)
+        digit.Value |> int
+
+    System.IO.File.ReadLines(filepath)
+    |> Seq.iter ( fun s1 ->
+        let game = gameNumRegex.Match(s1)
+        let gameId = game.Value |> int
+        let gameCubes = gamesRegex.Match(s1)
+
+        let blues = blueRegex.Matches(s1)
+        let blueArray = [| for b in blues -> getDigit b.Value |]
+        let minBlues = Seq.max blueArray
+        printfn $"Game {gameId} blue min is {minBlues}"
+
+        let reds = redRegex.Matches(s1)
+        let redArray = [| for r in reds -> getDigit r.Value |]
+        let minReds = Seq.max redArray
+        printfn $"Game {gameId} red min is {minReds}"
+
+        let greens = greenRegex.Matches(s1)
+        let greenArray = [| for g in greens -> getDigit g.Value |]
+        let minGreens = Seq.max greenArray
+        printfn $"Game {gameId} green min is {minGreens}"
+
+        let power = minBlues * minReds * minGreens
+
+        gamePowersAdded <- gamePowersAdded + power
+
+        printfn $"Total power: {gamePowersAdded}"
+    )
+
+checkPossibleGamesPartTwo"./data/input_part2.txt"
